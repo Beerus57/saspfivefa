@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>SASP – Rapport d’intervention</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+body {
+  font-family: 'Segoe UI', sans-serif;
+  background: radial-gradient(circle at top, #020617, #000);
+  color: #e5e7eb;
+  padding: 30px;
+}
+
+.container {
+  max-width: 1000px;
+  margin: auto;
+  background: #020617;
+  padding: 30px;
+  border-radius: 20px;
+  box-shadow: 0 20px 60px rgba(0,0,0,.7);
+  border: 1px solid #1e293b;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.header img {
+  width: 130px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+label {
+  text-transform: uppercase;
+  font-size: 12px;
+  opacity: .8;
+}
+
+input, textarea, select {
+  width: 100%;
+  padding: 10px;
+  border-radius: 10px;
+  border: 1px solid #1e293b;
+  background: #020617;
+  color: white;
+}
+
+textarea { resize: vertical; }
+
+.full { grid-column: span 2; }
+
+button {
+  margin-top: 25px;
+  padding: 15px;
+  width: 100%;
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  border: none;
+  border-radius: 14px;
+  color: white;
+  font-size: 17px;
+  cursor: pointer;
+}
+</style>
+</head>
+
+<body>
+<div class="container">
+
+<div class="header">
+  <img src="pngaaa.com-2421674.png">
+  <h1>San Andreas State Police</h1>
+  <p>Rapport d’intervention – RP</p>
+</div>
+
+<div class="grid">
+  <div>
+    <label>Officier</label>
+    <input id="officer">
+  </div>
+  <div>
+    <label>Badge</label>
+    <input id="badge">
+  </div>
+
+  <div>
+    <label>Grade</label>
+    <select id="grade">
+      <option>Trooper</option>
+      <option>Sergeant</option>
+      <option>Lieutenant</option>
+      <option>Captain</option>
+    </select>
+  </div>
+
+  <div>
+    <label>Unité</label>
+    <select id="unit">
+      <option>Patrol</option>
+      <option>Highway Patrol</option>
+      <option>SWAT</option>
+      <option>Detective</option>
+    </select>
+  </div>
+
+  <div>
+    <label>Date & Heure</label>
+    <input id="datetime">
+  </div>
+
+  <div>
+    <label>Type d’intervention</label>
+    <select id="type">
+      <option>Contrôle routier</option>
+      <option>Poursuite</option>
+      <option>Interpellation</option>
+      <option>Accident</option>
+    </select>
+  </div>
+
+  <div class="full">
+    <label>Lieu</label>
+    <input id="location">
+  </div>
+
+  <div class="full">
+    <label>Personnes impliquées</label>
+    <textarea id="persons"></textarea>
+  </div>
+
+  <div class="full">
+    <label>Déroulement des faits</label>
+    <textarea id="facts" rows="5"></textarea>
+  </div>
+
+  <div class="full">
+    <label>Photos / preuves</label>
+    <input type="file" id="photos" multiple accept="image/*">
+  </div>
+</div>
+
+<button onclick="sendToDiscord()">🚀 Envoyer sur Discord</button>
+</div>
+
+<script>
+const WEBHOOK_URL = "https://discordapp.com/api/webhooks/1463771725207699620/zUidbxDqAQbGI2RWighueJk0OpSNLwbTPsCtbF7onsPG0BmgUXLN8T_KYhwSUf-rrjr9";
+
+async function sendToDiscord() {
+  const files = document.getElementById("photos").files;
+
+  const embed = {
+    title: "🚔 Rapport d’intervention – SASP",
+    color: 3447003,
+    fields: [
+      { name: "Officier", value: document.getElementById("grade").value + " " + document.getElementById("officer").value, inline: true },
+      { name: "Badge", value: document.getElementById("badge").value, inline: true },
+      { name: "Unité", value: document.getElementById("unit").value, inline: true },
+      { name: "Date & Heure", value: document.getElementById("datetime").value, inline: true },
+      { name: "Lieu", value: document.getElementById("location").value, inline: true },
+      { name: "Type", value: document.getElementById("type").value, inline: true },
+      { name: "Personnes impliquées", value: document.getElementById("persons").value || "Aucune" },
+      { name: "Déroulement des faits", value: document.getElementById("facts").value || "Non renseigné" }
+    ],
+    footer: { text: "San Andreas State Police • RP" },
+    timestamp: new Date()
+  };
+
+  const formData = new FormData();
+
+  if (files.length > 0) {
+    embed.image = { url: `attachment://${files[0].name}` };
+  }
+
+  formData.append("payload_json", JSON.stringify({ embeds: [embed] }));
+
+  for (let i = 0; i < files.length; i++) {
+    formData.append(`files[${i}]`, files[i], files[i].name);
+  }
+
+  await fetch(WEBHOOK_URL, {
+    method: "POST",
+    body: formData
+  });
+}
+</script>
+
+</body>
+</html>
