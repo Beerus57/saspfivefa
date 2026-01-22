@@ -12,7 +12,6 @@ body {
   color: #e5e7eb;
   padding: 30px;
 }
-
 .container {
   max-width: 1000px;
   margin: auto;
@@ -22,28 +21,10 @@ body {
   box-shadow: 0 20px 60px rgba(0,0,0,.7);
   border: 1px solid #1e293b;
 }
-
-.header {
-  text-align: center;
-  margin-bottom: 30px;
-}
-
-.header img {
-  width: 130px;
-}
-
-.grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20px;
-}
-
-label {
-  text-transform: uppercase;
-  font-size: 12px;
-  opacity: .8;
-}
-
+.header { text-align: center; margin-bottom: 30px; }
+.header img { width: 130px; }
+.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+label { text-transform: uppercase; font-size: 12px; opacity: .8; }
 input, textarea, select {
   width: 100%;
   padding: 10px;
@@ -52,11 +33,8 @@ input, textarea, select {
   background: #020617;
   color: white;
 }
-
 textarea { resize: vertical; }
-
 .full { grid-column: span 2; }
-
 button {
   margin-top: 25px;
   padding: 15px;
@@ -80,14 +58,17 @@ button {
   <p>Rapport d’intervention – RP</p>
 </div>
 
+<!-- FORMULAIRE -->
+<form id="reportForm">
+
 <div class="grid">
   <div>
     <label>Officier</label>
-    <input id="officer">
+    <input id="officer" required>
   </div>
   <div>
     <label>Badge</label>
-    <input id="badge">
+    <input id="badge" required>
   </div>
 
   <div>
@@ -112,7 +93,7 @@ button {
 
   <div>
     <label>Date & Heure</label>
-    <input id="datetime">
+    <input id="datetime" required>
   </div>
 
   <div>
@@ -127,7 +108,7 @@ button {
 
   <div class="full">
     <label>Lieu</label>
-    <input id="location">
+    <input id="location" required>
   </div>
 
   <div class="full">
@@ -146,27 +127,30 @@ button {
   </div>
 </div>
 
-<button onclick="sendToDiscord()">🚀 Envoyer sur Discord</button>
+<button type="submit">🚀 Envoyer sur Discord</button>
+</form>
 </div>
 
 <script>
 const WEBHOOK_URL = "https://discordapp.com/api/webhooks/1463771725207699620/zUidbxDqAQbGI2RWighueJk0OpSNLwbTPsCtbF7onsPG0BmgUXLN8T_KYhwSUf-rrjr9";
 
-async function sendToDiscord() {
+document.getElementById("reportForm").addEventListener("submit", async function(e) {
+  e.preventDefault(); // empêche rechargement page
+
   const files = document.getElementById("photos").files;
 
   const embed = {
     title: "🚔 Rapport d’intervention – SASP",
     color: 3447003,
     fields: [
-      { name: "Officier", value: document.getElementById("grade").value + " " + document.getElementById("officer").value, inline: true },
-      { name: "Badge", value: document.getElementById("badge").value, inline: true },
-      { name: "Unité", value: document.getElementById("unit").value, inline: true },
-      { name: "Date & Heure", value: document.getElementById("datetime").value, inline: true },
-      { name: "Lieu", value: document.getElementById("location").value, inline: true },
-      { name: "Type", value: document.getElementById("type").value, inline: true },
-      { name: "Personnes impliquées", value: document.getElementById("persons").value || "Aucune" },
-      { name: "Déroulement des faits", value: document.getElementById("facts").value || "Non renseigné" }
+      { name: "Officier", value: grade.value + " " + officer.value, inline: true },
+      { name: "Badge", value: badge.value, inline: true },
+      { name: "Unité", value: unit.value, inline: true },
+      { name: "Date & Heure", value: datetime.value, inline: true },
+      { name: "Lieu", value: location.value, inline: true },
+      { name: "Type", value: type.value, inline: true },
+      { name: "Personnes impliquées", value: persons.value || "Aucune" },
+      { name: "Déroulement des faits", value: facts.value || "Non renseigné" }
     ],
     footer: { text: "San Andreas State Police • RP" },
     timestamp: new Date()
@@ -184,26 +168,12 @@ async function sendToDiscord() {
     formData.append(`files[${i}]`, files[i], files[i].name);
   }
 
-  await fetch(WEBHOOK_URL, {
-    method: "POST",
-    body: formData
-  });
+  await fetch(WEBHOOK_URL, { method: "POST", body: formData });
 
-  // RESET DES CHAMPS APRÈS ENVOI
-  document.getElementById("officer").value = "";
-  document.getElementById("badge").value = "";
-  document.getElementById("datetime").value = "";
-  document.getElementById("location").value = "";
-  document.getElementById("persons").value = "";
-  document.getElementById("facts").value = "";
-  document.getElementById("photos").value = "";
-
-  document.getElementById("grade").selectedIndex = 0;
-  document.getElementById("unit").selectedIndex = 0;
-  document.getElementById("type").selectedIndex = 0;
-
+  // RESET GARANTI
+  this.reset();
   alert("✅ Rapport envoyé et formulaire réinitialisé !");
-}
+});
 </script>
 
 </body>
