@@ -188,6 +188,21 @@ async function sendToDiscord() {
     method: "POST",
     body: formData
   });
+
+  // RESET DES CHAMPS APRÈS ENVOI
+  document.getElementById("officer").value = "";
+  document.getElementById("badge").value = "";
+  document.getElementById("datetime").value = "";
+  document.getElementById("location").value = "";
+  document.getElementById("persons").value = "";
+  document.getElementById("facts").value = "";
+  document.getElementById("photos").value = "";
+
+  document.getElementById("grade").selectedIndex = 0;
+  document.getElementById("unit").selectedIndex = 0;
+  document.getElementById("type").selectedIndex = 0;
+
+  alert("✅ Rapport envoyé et formulaire réinitialisé !");
 }
 </script>
 
